@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load shop_extras %}
+{% block title %}{{ product.name }} — DukaLink{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="breadcrumb">
+    <a href="{% url 'home' %}">Home</a> /
+    <a href="{% url 'product_list' %}?category={{ product.category.slug }}">{{ product.category.name }}</a> /
+    {{ product.name }}
+  </div>
+
+  <div class="pdp-grid">
+    <div class="pdp-thumb">
+      {% if product.display_image %}<img src="{{ product.display_image }}" alt="{{ product.name }}" />{% endif %}
+    </div>
+
+    <div>
+      <span class="pdp-category">{{ product.category.name }}</span>
+      <h1 class="pdp-title">{{ product.name }}</h1>
+      <div class="pdp-rating"><span class="stars">★ {{ product.rating }}</span> <span>rated by shoppers</span></div>
+
+      <div class="pdp-price-row">
+        <span class="pdp-price-now">{{ product.current_price|pkr }}</span>
+        {% if product.discount_price %}
+          <span class="pdp-price-old">{{ product.price|pkr }}</span>
+          <span class="pdp-discount-chip">Save {{ product.discount_percent }}%</span>
+        {% endif %}
+      </div>
+
+      <p class="pdp-short-desc">{{ product.short_description }}</p>
+      <p class="pdp-desc">{{ product.description }}</p>
+
+      {% if product.feature_list %}
+        <ul class="pdp-highlights">
+          {% for f in product.feature_list %}<li>{{ f }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+
+      <div class="qty-row">
+        <div class="qty-control">
+          <button type="button" data-pdp-qty-minus>−</button>
+          <span id="pdp-qty-value" data-max="{{ product.stock }}">1</span>
+          <button type="button" data-pdp-qty-plus>+</button>
+        </div>
+        <span class="stock-note {% if product.stock <= 5 and product.in_stock %}low{% endif %}">{{ product.stock_label }}</span>
+      </div>
+
+      <div class="pdp-actions">
+        <button
+          class="btn btn-primary btn-lg"
+          data-add-to-cart
+          data-product-id="{{ product.id }}"
+          data-qty-source="#pdp-qty-value"
+          {% if not product.in_stock %}disabled{% endif %}
+        >{% if product.in_stock %}Add to Cart{% else %}Sold Out{% endif %}</button>
+
+        {% if product.in_stock %}
+        <button type="button" class="btn btn-accent btn-lg" id="buy-now-btn">Buy Now</button>
+        {% endif %}
+
+        <button
+          type="button"
+          class="btn-icon {% if in_wishlist %}active{% endif %}"
+          data-wishlist-toggle
+          data-product-id="{{ product.id }}"
+          data-authenticated="{{ request.user.is_authenticated|yesno:'true,false' }}"
+          data-login-url="{% url 'login' %}"
+          aria-label="Toggle wishlist"
+        >{% if in_wishlist %}♥{% else %}♡{% endif %}</button>
+      </div>
+    </div>
+  </div>
+
+  {% if related_products %}
+    <h2 class="related-heading">You might also like</h2>
+    <div class="product-grid" style="margin-bottom:60px">
+      {% for product in related_products %}{% include "partials/product_card.html" %}{% endfor %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const buyNowBtn = document.getElementById("buy-now-btn");
+  if (buyNowBtn) {
+    buyNowBtn.addEventListener("click", async () => {
+      buyNowBtn.disabled = true;
+      buyNowBtn.textContent = "Please wait…";
+      try {
+        const qty = document.getElementById("pdp-qty-value").textContent;
+        await postForm("/cart/add/", { product_id: "{{ product.id }}", quantity: qty });
+        window.location.href = "{% url 'checkout' %}";
+      } catch (err) {
+        showToast(err.message, "error");
+        buyNowBtn.disabled = false;
+        buyNowBtn.textContent = "Buy Now";
+      }
+    });
+  }
+</script>
+{% endblock %}

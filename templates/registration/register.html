@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Create Account — DukaLink{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="auth-wrap">
+    <h2>Create your account</h2>
+    <p class="sub">Save your wishlist and track orders across visits.</p>
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<p style="font-size:11.5px;color:var(--muted);margin-top:4px">{{ field.help_text|safe }}</p>{% endif %}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+    </form>
+    <div class="auth-switch">Already have an account? <a href="{% url 'login' %}">Log in</a></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% load shop_extras %}
+<article class="product-card">
+  <div class="product-thumb-wrap">
+    <a href="{{ product.get_absolute_url }}">
+      {% if product.display_image %}
+        <img src="{{ product.display_image }}" alt="{{ product.name }}" loading="lazy" />
+      {% endif %}
+    </a>
+    <div class="product-badges">
+      {% if product.discount_price %}<span class="badge-tag badge-sale">-{{ product.discount_percent }}%</span>{% endif %}
+      {% if product.is_new_arrival %}<span class="badge-tag badge-new">New</span>{% endif %}
+      {% if not product.in_stock %}<span class="badge-tag badge-out">Sold out</span>{% endif %}
+    </div>
+    <button
+      type="button"
+      class="wishlist-btn {% if product.id in wishlist_ids %}active{% endif %}"
+      data-wishlist-toggle
+      data-product-id="{{ product.id }}"
+      data-authenticated="{{ request.user.is_authenticated|yesno:'true,false' }}"
+      data-login-url="{% url 'login' %}"
+      aria-label="Toggle wishlist"
+    >{% if product.id in wishlist_ids %}♥{% else %}♡{% endif %}</button>
+  </div>
+  <div class="product-body">
+    <span class="product-category">{{ product.category.name }}</span>
+    <h3 class="product-name"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
+    <div class="product-rating">★ {{ product.rating }} <span class="count">rating</span></div>
+    <div class="price-row">
+      <span class="price-now">{{ product.current_price|pkr }}</span>
+      {% if product.discount_price %}<span class="price-old">{{ product.price|pkr }}</span>{% endif %}
+    </div>
+    <span class="stock-note {% if product.stock <= 5 and product.in_stock %}low{% endif %}">
+      {{ product.stock_label }}
+    </span>
+    <div class="product-foot">
+      <button
+        class="btn btn-primary btn-sm btn-block"
+        data-add-to-cart
+        data-product-id="{{ product.id }}"
+        {% if not product.in_stock %}disabled{% endif %}
+      >{% if product.in_stock %}Add to Cart{% else %}Sold out{% endif %}</button>
+    </div>
+  </div>
+</article>

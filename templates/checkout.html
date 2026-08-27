@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load shop_extras %}
+{% block title %}Checkout — DukaLink{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="breadcrumb"><a href="{% url 'home' %}">Home</a> / <a href="{% url 'cart' %}">Cart</a> / Checkout</div>
+  <h1 style="font-size:26px;margin-bottom:20px">Checkout</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="checkout-layout">
+      <div>
+        <div class="form-section">
+          <h3>Contact &amp; Shipping Details</h3>
+          <div class="field">
+            <label for="{{ form.customer_name.id_for_label }}">Full name</label>
+            {{ form.customer_name }}
+            {{ form.customer_name.errors }}
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="{{ form.phone.id_for_label }}">Phone number</label>
+              {{ form.phone }}
+              {{ form.phone.errors }}
+            </div>
+            <div class="field">
+              <label for="{{ form.email.id_for_label }}">Email</label>
+              {{ form.email }}
+              {{ form.email.errors }}
+            </div>
+          </div>
+          <div class="field">
+            <label for="{{ form.address.id_for_label }}">Complete address</label>
+            {{ form.address }}
+            {{ form.address.errors }}
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="{{ form.city.id_for_label }}">City</label>
+              {{ form.city }}
+              {{ form.city.errors }}
+            </div>
+            <div class="field">
+              <label for="{{ form.postal_code.id_for_label }}">Postal code</label>
+              {{ form.postal_code }}
+              {{ form.postal_code.errors }}
+            </div>
+          </div>
+          <div class="field">
+            <label for="{{ form.notes.id_for_label }}">Order notes (optional)</label>
+            {{ form.notes }}
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Payment Method</h3>
+          <div class="payment-options">
+            {% for radio in form.payment_method %}
+              <label class="payment-option">
+                {{ radio.tag }}
+                {{ radio.choice_label }}
+              </label>
+            {% endfor %}
+          </div>
+          <p class="payment-note">This is a demo project — Cash on Delivery is the primary flow. "Demo Card Payment" does not collect or process any real card details.</p>
+        </div>
+      </div>
+
+      <aside class="summary-card">
+        <h3>Your Order</h3>
+        {% for item in cart %}
+          <div class="mini-cart-item">
+            <span>{{ item.quantity }}× {{ item.product.name }}</span>
+            <span>{{ item.line_total|pkr }}</span>
+          </div>
+        {% endfor %}
+        <div class="summary-row" style="margin-top:12px"><span>Subtotal</span><span class="val">{{ cart.subtotal|pkr }}</span></div>
+        <div class="summary-row"><span>Delivery</span><span class="val">{% if cart.delivery_fee == 0 %}Free{% else %}{{ cart.delivery_fee|pkr }}{% endif %}</span></div>
+        <div class="summary-row total"><span>Total</span><span class="val">{{ cart.total|pkr }}</span></div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px">Place Order</button>
+      </aside>
+    </div>
+  </form>
+</div>
+{% endblock %}

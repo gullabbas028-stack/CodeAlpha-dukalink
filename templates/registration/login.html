@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Login — DukaLink{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="auth-wrap">
+    <h2>Welcome back</h2>
+    <p class="sub">Log in to view your orders and wishlist.</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="field">
+        <label for="{{ form.username.id_for_label }}">Username</label>
+        {{ form.username }}
+      </div>
+      <div class="field">
+        <label for="{{ form.password.id_for_label }}">Password</label>
+        {{ form.password }}
+      </div>
+      {% if form.errors %}
+        <div class="alert alert-error" style="margin-bottom:14px">Incorrect username or password. Please try again.</div>
+      {% endif %}
+      <button type="submit" class="btn btn-primary btn-block">Log In</button>
+      <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+    <div class="auth-switch">Don't have an account? <a href="{% url 'register' %}">Create one</a></div>
+  </div>
+</div>
+{% endblock %}

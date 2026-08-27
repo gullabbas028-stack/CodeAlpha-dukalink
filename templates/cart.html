@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load shop_extras %}
+{% block title %}Your Cart — DukaLink{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="breadcrumb"><a href="{% url 'home' %}">Home</a> / Cart</div>
+  <h1 style="font-size:26px;margin-bottom:20px">Your Cart</h1>
+
+  {% if cart|length == 0 %}
+    <div class="empty-state" style="padding:80px 20px">
+      <h3>Your cart is empty</h3>
+      <p>Looks like you haven't added anything yet.</p>
+      <a class="btn btn-primary" href="{% url 'product_list' %}" style="margin-top:18px;display:inline-flex">Continue Shopping</a>
+    </div>
+  {% else %}
+    <div class="cart-layout">
+      <div class="cart-table">
+        {% for item in cart %}
+          <div class="cart-row" data-cart-row="{{ item.product.id }}">
+            <div class="cart-thumb">
+              {% if item.product.display_image %}<img src="{{ item.product.display_image }}" alt="{{ item.product.name }}" />{% endif %}
+            </div>
+            <div>
+              <div class="cart-item-name">
+                <a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+              </div>
+              <div class="cart-item-price">{{ item.unit_price|pkr }} each</div>
+              <button type="button" class="cart-item-remove" data-cart-remove>Remove</button>
+            </div>
+            <div class="qty-control">
+              <button type="button" data-qty-decr>−</button>
+              <span data-qty-value>{{ item.quantity }}</span>
+              <button type="button" data-qty-incr>+</button>
+            </div>
+            <div class="cart-line-total" data-line-total>{{ item.line_total|pkr }}</div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <aside class="summary-card">
+        <h3>Order Summary</h3>
+        <div class="summary-row"><span>Subtotal</span><span class="val" data-cart-subtotal>{{ cart.subtotal|pkr }}</span></div>
+        <div class="summary-row"><span>Delivery</span><span class="val" data-cart-delivery>{% if cart.delivery_fee == 0 %}Free{% else %}{{ cart.delivery_fee|pkr }}{% endif %}</span></div>
+        <div class="summary-row total"><span>Total</span><span class="val" data-cart-total>{{ cart.total|pkr }}</span></div>
+        {% if cart.remaining_for_free_delivery > 0 %}
+          <p class="free-ship-note">Add {{ cart.remaining_for_free_delivery|pkr }} more to unlock free delivery.</p>
+        {% endif %}
+        <a class="btn btn-primary btn-block" href="{% url 'checkout' %}" style="margin-top:16px">Proceed to Checkout</a>
+        <a class="btn btn-outline btn-block" href="{% url 'product_list' %}" style="margin-top:10px">Continue Shopping</a>
+      </aside>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

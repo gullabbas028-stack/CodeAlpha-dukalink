@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load shop_extras %}
+{% block title %}My Orders — DukaLink{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="breadcrumb"><a href="{% url 'home' %}">Home</a> / My Orders</div>
+  <h1 style="font-size:26px;margin-bottom:6px">Hi, {{ user.username }}</h1>
+  <p style="color:var(--muted);margin-bottom:24px">Here's your order history.</p>
+
+  {% if orders %}
+    {% for order in orders %}
+      <div class="order-card">
+        <div class="order-card-head">
+          <span class="num">Order #{{ order.order_number }}</span>
+          <span class="order-status {{ order.status }}">{{ order.get_status_display }}</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:10px">
+          Placed on {{ order.created_at|date:"d M Y, H:i" }} · {{ order.get_payment_method_display }}
+        </div>
+        {% for item in order.items.all %}
+          <div class="mini-cart-item">
+            <span>{{ item.quantity }}× {{ item.product_name }}</span>
+            <span>{{ item.subtotal|pkr }}</span>
+          </div>
+        {% endfor %}
+        <div class="summary-row total" style="margin-top:10px"><span>Total</span><span class="val">{{ order.total|pkr }}</span></div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state" style="padding:80px 20px">
+      <h3>No orders yet</h3>
+      <p>Your placed orders will show up here.</p>
+      <a class="btn btn-primary" href="{% url 'product_list' %}" style="margin-top:18px;display:inline-flex">Start Shopping</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

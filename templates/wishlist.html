@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load shop_extras %}
+{% block title %}Your Wishlist — DukaLink{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="breadcrumb"><a href="{% url 'home' %}">Home</a> / Wishlist</div>
+  <h1 style="font-size:26px;margin-bottom:20px">Your Wishlist</h1>
+
+  {% if items %}
+    <div class="product-grid">
+      {% for wish in items %}
+        {% include "partials/product_card.html" with product=wish.product %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state" style="padding:80px 20px">
+      <h3>Your wishlist is empty</h3>
+      <p>Tap the heart on any product to save it here for later.</p>
+      <a class="btn btn-primary" href="{% url 'product_list' %}" style="margin-top:18px;display:inline-flex">Browse Products</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

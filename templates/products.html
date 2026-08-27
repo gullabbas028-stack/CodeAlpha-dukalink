@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load shop_extras %}
+{% block title %}Shop All Products — DukaLink{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="breadcrumb"><a href="{% url 'home' %}">Home</a> / Shop</div>
+
+  <div class="listing-layout">
+    <aside class="filter-panel">
+      <form method="get" id="filter-form">
+        {% if query %}<input type="hidden" name="q" value="{{ query }}" />{% endif %}
+
+        <h4>Categories</h4>
+        <label class="filter-option category-option {% if not selected_category %}active{% endif %}">
+          <input type="radio" name="category" value="" onchange="this.form.submit()" {% if not selected_category %}checked{% endif %} />
+          All Categories
+        </label>
+        {% for cat in categories %}
+          <label class="filter-option category-option {% if selected_category == cat.slug %}active{% endif %}">
+            <input type="radio" name="category" value="{{ cat.slug }}" onchange="this.form.submit()" {% if selected_category == cat.slug %}checked{% endif %} />
+            {{ cat.icon }} {{ cat.name }}
+          </label>
+        {% endfor %}
+
+        <h4>Price range (Rs.)</h4>
+        <div class="price-inputs">
+          <input type="number" name="min_price" placeholder="Min" value="{{ min_price }}" min="0" />
+          <span>–</span>
+          <input type="number" name="max_price" placeholder="Max" value="{{ max_price }}" min="0" />
+        </div>
+
+        <h4>Availability</h4>
+        <label class="filter-option">
+          <input type="radio" name="availability" value="" onchange="this.form.submit()" {% if not availability %}checked{% endif %} /> All
+        </label>
+        <label class="filter-option">
+          <input type="radio" name="availability" value="in_stock" onchange="this.form.submit()" {% if availability == "in_stock" %}checked{% endif %} /> In stock
+        </label>
+        <label class="filter-option">
+          <input type="radio" name="availability" value="out_of_stock" onchange="this.form.submit()" {% if availability == "out_of_stock" %}checked{% endif %} /> Out of stock
+        </label>
+
+        <h4>Minimum rating</h4>
+        <label class="filter-option">
+          <input type="radio" name="min_rating" value="" onchange="this.form.submit()" {% if not min_rating %}checked{% endif %} /> Any rating
+        </label>
+        {% for r in "4321" %}
+          <label class="filter-option">
+            <input type="radio" name="min_rating" value="{{ r }}" onchange="this.form.submit()" {% if min_rating == r %}checked{% endif %} /> {{ r }}★ &amp; up
+          </label>
+        {% endfor %}
+
+        <input type="hidden" name="sort" value="{{ sort }}" />
+        <button type="submit" class="btn btn-primary btn-block btn-sm" style="margin-top:16px">Apply Filters</button>
+        <a href="{% url 'product_list' %}" class="btn btn-outline btn-block btn-sm" style="margin-top:8px">Clear all</a>
+      </form>
+    </aside>
+
+    <div>
+      <div class="listing-toolbar">
+        <span class="result-count">
+          {% if query %}Results for "<strong>{{ query }}</strong>" — {% endif %}{{ result_count }} product{{ result_count|pluralize }}
+        </span>
+        <div class="sort-row">
+          <label for="sort-select" style="margin:0">Sort by</label>
+          <select id="sort-select" onchange="document.getElementById('filter-form').sort.value=this.value;document.getElementById('filter-form').submit()">
+            <option value="newest" {% if sort == "newest" %}selected{% endif %}>Newest</option>
+            <option value="popular" {% if sort == "popular" %}selected{% endif %}>Popular</option>
+            <option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>Price: High to Low</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="product-grid">
+        {% for product in products %}
+          {% include "partials/product_card.html" %}
+        {% empty %}
+          <div class="empty-state">
+            <h3>No products found</h3>
+            <p>Try clearing a filter or searching a different term.</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

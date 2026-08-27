@@ -1,0 +1,135 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}DukaLink — Shop Smart, Live Better{% endblock %}</title>
+  <meta name="description" content="DukaLink — your one-stop online store for electronics, fashion, beauty, home essentials and more." />
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  {% csrf_token %}
+  <div class="topbar">Free delivery on orders over Rs. 5,000 &nbsp;•&nbsp; Cash on Delivery available nationwide</div>
+
+  <header class="site-header">
+    <div class="container header-main">
+      <a class="logo" href="{% url 'home' %}">Duka<span>Link</span></a>
+
+      <form class="search-form header-search-desktop" action="{% url 'product_list' %}" method="get">
+        <input type="text" name="q" placeholder="Search for products, brands and categories…" value="{{ query|default:'' }}" autocomplete="off" />
+        <button type="submit">Search</button>
+      </form>
+
+      <div class="header-actions">
+        <a class="icon-link" href="{% url 'wishlist' %}">
+          ♡ <span class="hide-sm">Wishlist</span>
+          <span class="badge" data-wishlist-badge style="{% if not wishlist_count %}display:none{% endif %}">{{ wishlist_count }}</span>
+        </a>
+        <a class="icon-link" href="{% url 'cart' %}">
+          🛒 <span class="hide-sm">Cart</span>
+          <span class="badge" data-cart-badge style="{% if not cart_item_count %}display:none{% endif %}">{{ cart_item_count }}</span>
+        </a>
+        {% if user.is_authenticated %}
+          <a class="icon-link" href="{% url 'profile' %}">👤 {{ user.username }}</a>
+          <form action="{% url 'logout' %}" method="post" style="margin:0">
+            {% csrf_token %}
+            <button type="submit" class="icon-link" style="border:1px solid var(--border);background:var(--white)">Logout</button>
+          </form>
+        {% else %}
+          <a class="icon-link" href="{% url 'login' %}">👤 Login</a>
+        {% endif %}
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">☰</button>
+      </div>
+    </div>
+
+    <nav class="category-nav">
+      <div class="container category-nav-inner">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'product_list' %}">Shop All</a>
+        {% for cat in nav_categories %}
+          <a href="{% url 'product_list' %}?category={{ cat.slug }}">{{ cat.icon }} {{ cat.name }}</a>
+        {% endfor %}
+      </div>
+    </nav>
+
+    <div class="mobile-panel" id="mobile-panel">
+      <form action="{% url 'product_list' %}" method="get" style="margin-bottom:10px">
+        <input type="text" name="q" placeholder="Search products…" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px" />
+      </form>
+      <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'product_list' %}">Shop All</a>
+      {% for cat in nav_categories %}
+        <a href="{% url 'product_list' %}?category={{ cat.slug }}">{{ cat.icon }} {{ cat.name }}</a>
+      {% endfor %}
+      <a href="{% url 'wishlist' %}">Wishlist</a>
+      <a href="{% url 'cart' %}">Cart</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'profile' %}">My Orders</a>
+        <form action="{% url 'logout' %}" method="post" style="margin:0">
+          {% csrf_token %}
+          <button type="submit" style="background:none;border:none;padding:10px 4px;font-size:14px;font-weight:500;color:var(--text);width:100%;text-align:left;border-bottom:1px solid var(--border)">Logout</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'register' %}">Create account</a>
+      {% endif %}
+    </div>
+  </header>
+
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-logo">Duka<span>Link</span></div>
+          <p>Your one-stop online store for electronics, fashion, beauty and home essentials — delivered nationwide with Cash on Delivery.</p>
+          <div class="social-row">
+            <a href="#" aria-label="Facebook">f</a>
+            <a href="#" aria-label="Instagram">in</a>
+            <a href="#" aria-label="LinkedIn">in</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Customer Service</h4>
+          <a href="#">Contact Us</a>
+          <a href="#">Shipping Information</a>
+          <a href="#">Returns</a>
+          <a href="#">FAQs</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="#">About Us</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms &amp; Conditions</a>
+        </div>
+        <div class="footer-col">
+          <h4>Get in touch</h4>
+          <p>support@dukalink.pk</p>
+          <p>+92 300 1234567</p>
+          <p>Lahore, Pakistan</p>
+        </div>
+      </div>
+      <div class="footer-bottom">© {% now "Y" %} DukaLink. Built as a demo project — no real payments are processed.</div>
+    </div>
+  </footer>
+
+  <div id="toast-root"></div>
+
+  <script>window.DUKALINK_CURRENCY = "{{ CURRENCY_SYMBOL|default:'Rs. ' }}";</script>
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>
