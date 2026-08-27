@@ -113,7 +113,6 @@ USE_TZ = True
 # Static & media files
 # ---------------------------------------------------------------------------
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 if os.environ.get("VERCEL"):
