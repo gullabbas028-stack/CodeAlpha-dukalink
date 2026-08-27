@@ -14,16 +14,51 @@ CATEGORY_DEFS = [
     ("Sports", "🏸"),
 ]
 
-PLACEHOLDER_COLORS = {
-    "Electronics": "2563EB",
-    "Mobile Accessories": "0EA5E9",
-    "Fashion": "F59E0B",
-    "Shoes": "DC2626",
-    "Beauty": "EC4899",
-    "Home & Kitchen": "16A34A",
-    "Accessories": "7C3AED",
-    "Sports": "0F172A",
+PRODUCT_IMAGE_URLS = {
+    "headphones": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e",
+    "watch": "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+    "speaker": "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1",
+    "camera": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32",
+    "keyboard": "https://images.unsplash.com/photo-1587829741301-dc798b83add3",
+    "mouse": "https://images.unsplash.com/photo-1527814050087-3793815479db",
+    "monitor": "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf",
+    "phone": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9",
+    "cycling": "https://images.unsplash.com/photo-1558981806-ec527fa84c39",
+    "resistance": "https://images.unsplash.com/photo-1598289431512-b97b0917affc",
+    "badminton": "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea",
+    "football": "https://images.unsplash.com/photo-1579952363873-27f3bade9f55",
+    "dumbbell": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61",
+    "yoga": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b",
+    "card": "https://images.unsplash.com/photo-1627123424574-724758594e93",
+    "shirt": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf",
+    "dress": "https://images.unsplash.com/photo-1496747611176-843222e1e57c",
+    "jeans": "https://images.unsplash.com/photo-1542272604-787c3835535d",
+    "jacket": "https://images.unsplash.com/photo-1551028719-00167b16eac5",
+    "hoodie": "https://images.unsplash.com/photo-1556821840-3a63f95609a7",
+    "shoes": "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+    "lipstick": "https://images.unsplash.com/photo-1586495777744-4413f21062fa",
+    "face": "https://images.unsplash.com/photo-1556229010-6c3f2c9ca5f8",
+    "hair": "https://images.unsplash.com/photo-1522338242992-e1a54906a8da",
+    "serum": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be",
+    "cookware": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f",
+    "kettle": "https://images.unsplash.com/photo-1556911220-e15b29be8c8f",
+    "pillow": "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2",
+    "dinner": "https://images.unsplash.com/photo-1603199506016-b9a594b593c0",
+    "vacuum": "https://images.unsplash.com/photo-1558317374-067fb5f30001",
+    "lunch": "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519",
+    "sunglasses": "https://images.unsplash.com/photo-1511499767150-a48a237f0083",
+    "backpack": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62",
+    "fitness": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
 }
+
+
+def product_image_url(name):
+    name_lower = name.lower()
+    image_url = next(
+        (url for keyword, url in PRODUCT_IMAGE_URLS.items() if keyword in name_lower),
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+    )
+    return f"{image_url}?auto=format&fit=crop&w=600&h=600&q=85"
 
 # (name, short_description, description, price, discount_price or None,
 #  stock, rating, features[list], flags: featured/new/popular/sale)
@@ -356,7 +391,6 @@ class Command(BaseCommand):
         created_count = 0
         for category_name, product_rows in PRODUCTS.items():
             category = categories[category_name]
-            color = PLACEHOLDER_COLORS.get(category_name, "2563EB")
             for row in product_rows:
                 (
                     name, short_desc, desc, price, discount_price, stock, rating,
@@ -365,9 +399,6 @@ class Command(BaseCommand):
 
                 if Product.objects.filter(name=name).exists():
                     continue
-
-                image_text = "+".join(name.split()[:2])
-                image_url = f"https://placehold.co/600x600/{color}/FFFFFF?text={image_text}&font=poppins"
 
                 Product.objects.create(
                     name=name,
@@ -379,7 +410,7 @@ class Command(BaseCommand):
                     stock=stock,
                     rating=rating,
                     features="\n".join(features),
-                    image_url=image_url,
+                    image_url=product_image_url(name),
                     is_featured=is_featured,
                     is_new_arrival=is_new_arrival,
                     is_popular=is_popular,
