@@ -20,5 +20,6 @@ if os.environ.get('VERCEL'):
 		from django.core.management import call_command
 
 		call_command('migrate', interactive=False)
+		call_command('seed_products')
 	except Exception as exc:
 		print('Migration error:', exc)
