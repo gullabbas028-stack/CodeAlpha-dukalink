@@ -18,9 +18,16 @@ SECRET_KEY = os.environ.get(
     "dev-only-insecure-secret-key-change-me-1234567890",
 )
 
-DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
+DEBUG = os.environ.get("DJANGO_DEBUG", "False" if os.environ.get("VERCEL") else "True") == "True"
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(",")
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+if os.environ.get("VERCEL_URL"):
+    CSRF_TRUSTED_ORIGINS.append(f"https://{os.environ['VERCEL_URL']}")
 
 # ---------------------------------------------------------------------------
 # Applications
@@ -104,11 +111,11 @@ USE_TZ = True
 # ---------------------------------------------------------------------------
 # Static & media files
 # ---------------------------------------------------------------------------
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_URL = "media/"
+MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
